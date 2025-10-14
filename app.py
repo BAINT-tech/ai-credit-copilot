@@ -1,17 +1,16 @@
 import streamlit as st
 import google.generativeai as genai
-import os
 
 st.title("💳 AI Credit Copilot")
-st.write("Get AI-powered guidance to improve and manage your credit with Capilot AI (auto fallback enabled).")
+st.write("Get AI-powered guidance to improve and manage your credit with Gemini AI (auto fallback enabled).")
 
-# Load your Gemini API key
+# Configure your Gemini API key
 api_key = st.secrets["GOOGLE_API_KEY"]
 genai.configure(api_key=api_key)
 
-# Define models
-PRIMARY_MODEL = "gemini-2.5-pro-preview-03-25"
-FALLBACK_MODEL = "gemini-1.5-flash"
+# Updated model names (for latest Gemini API)
+PRIMARY_MODEL = "models/gemini-1.5-pro"
+FALLBACK_MODEL = "models/gemini-1.5-flash"
 
 def generate_answer(question):
     """Try the main model, fallback to a lighter one if quota or error occurs."""
@@ -30,7 +29,7 @@ def generate_answer(question):
                 return f"⚠️ Both models unavailable. Error: {e2}"
         return f"⚠️ Error: {e}"
 
-# User input
+# User input section
 user_question = st.text_input("Enter your credit-related question:")
 if st.button("Ask AI"):
     if user_question.strip():
