@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # -------------------------------
-# 💳 AI Credit Copilot — Gemini Edition
+# 💳 AI Credit Copilot — Gemini Edition (Fixed)
 # -------------------------------
 
 st.set_page_config(page_title="💳 AI Credit Copilot", page_icon="💳")
@@ -10,14 +10,14 @@ st.set_page_config(page_title="💳 AI Credit Copilot", page_icon="💳")
 st.title("💳 AI Credit Copilot")
 st.write("Get AI-powered guidance to improve and manage your credit using credit capilot AI.")
 
-# 🔑 Set up your Gemini API key
+# 🔑 Gemini API Key
 GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", "")
 
 if not GOOGLE_API_KEY:
     st.warning("⚠️ Please add your Google API key in Streamlit Secrets as 'GOOGLE_API_KEY'.")
 else:
     genai.configure(api_key=GOOGLE_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-1.5-flash-latest")  # 👈 Updated model name
 
 # 🧠 User Input
 credit_question = st.text_input("Enter your credit-related question:")
