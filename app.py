@@ -1,26 +1,33 @@
 import streamlit as st
-from openai import OpenAI
+import google.generativeai as genai
 
+# Load your Google API key from Streamlit secrets
+api_key = st.secrets["GOOGLE_API_KEY"]
+
+# Configure Gemini
+genai.configure(api_key=api_key)
+
+# App UI
+st.set_page_config(page_title="💳 AI Credit Copilot", page_icon="💳")
 st.title("💳 AI Credit Copilot")
-st.write("Get AI-powered guidance to improve and manage your credit.")
+st.caption("Get AI-powered guidance to improve and manage your credit with Google Gemini AI.")
 
-# ✅ Correct client initialization
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
+# User input
 question = st.text_input("Enter your credit-related question:")
 
-if question:
-    with st.spinner("Thinking..."):
+# When user asks a question
+if st.button("Ask AI"):
+    if question.strip() == "":
+        st.warning("Please enter a question first.")
+    else:
         try:
-            # ✅ Correct chat call for new OpenAI API
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "You are an AI financial advisor that gives credit improvement tips."},
-                    {"role": "user", "content": question},
-                ]
-            )
-            st.success("✅ Here's your AI advice:")
-            st.write(response.choices[0].message.content)
+            # Use Gemini 1.5 model
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            response = model.generate_content(question)
+
+            # Display the answer
+            st.success("✅ Here’s what Gemini suggests:")
+            st.write(response.text)
+
         except Exception as e:
-            st.error(f"⚠️ Error: {e}")
+            st.error(f"⚠️ Error: {str(e)}")
