@@ -9,7 +9,7 @@ st.set_page_config(page_title="💳 AI Credit Copilot", page_icon="💳", layout
 # ----------------------------
 # Brand Logo
 # ----------------------------
-st.image("logo.png", width=150)  # Replace with your logo file
+st.image("https://i.ibb.co/W4HFdrLr/file-00000000f86461f49839fa2a594a9afe.png", width=150)  # Replace with your logo file
 st.title("💳 AI Credit Copilot")
 st.write("Get AI-powered guidance to improve and manage your credit. Track your scores and see chat history!")
 
