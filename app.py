@@ -1,36 +1,26 @@
 import streamlit as st
-import requests
-import json
 
-st.title("💳 AI Credit Copilot")
-st.write("Get AI-powered guidance to improve and manage your credit with Capilot AI.")
+st.title("💳 AI Credit Copilot (Plan B)")
+st.write("Test AI credit guidance instantly without API issues!")
 
-api_key = st.text_input("Enter your Gemini API Key:", type="password")
-
+# User input
 question = st.text_area("Enter your credit-related question:")
 
 if st.button("Ask AI"):
-    if not api_key or not question:
-        st.warning("Please enter both your API key and a question.")
+    if not question.strip():
+        st.warning("Please enter a question first.")
     else:
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
-        headers = {"Content-Type": "application/json"}
-        data = {
-            "contents": [{
-                "parts": [{"text": f"Answer this credit-related question clearly and professionally: {question}"}]
-            }]
+        # Simulated AI response (replace with real API later)
+        st.spinner("Thinking...")
+        simulated_responses = {
+            "credit score": "Focus on paying down debts, keeping balances low, and paying on time.",
+            "debt": "Consider a debt snowball or avalanche method and avoid new high-interest loans.",
+            "loan": "Check your interest rates and consolidate if needed for lower payments."
         }
-
-        response = requests.post(url, headers=headers, data=json.dumps(data))
-
-        if response.status_code == 200:
-            result = response.json()
-            try:
-                text_output = result["candidates"][0]["content"]["parts"][0]["text"]
-                st.success("✅ AI Credit Copilot says:")
-                st.write(text_output)
-            except Exception:
-                st.error("⚠️ Unexpected response format from the API.")
-                st.json(result)
-        else:
-            st.error(f"⚠️ Error {response.status_code}: {response.text}")
+        
+        # Simple matching
+        answer = next((v for k, v in simulated_responses.items() if k in question.lower()), 
+                      "💡 Make sure to pay bills on time and monitor your credit regularly.")
+        
+        st.success("✅ AI Credit Copilot says:")
+        st.write(answer)
