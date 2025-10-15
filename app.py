@@ -1,40 +1,36 @@
 import streamlit as st
-import google.generativeai as genai
+import requests
+import json
 
 st.title("💳 AI Credit Copilot")
-st.write("Get AI-powered guidance to improve and manage your credit with credit Capilot AI (auto fallback enabled).")
+st.write("Get AI-powered guidance to improve and manage your credit with Capilot AI.")
 
-# Load your Gemini API key securely
-api_key = st.secrets["GOOGLE_API_KEY"]
-genai.configure(api_key=api_key)
+api_key = st.text_input("Enter your Gemini API Key:", type="password")
 
-# Correct model IDs for the new API
-PRIMARY_MODEL = "gemini-1.5-pro-latest"
-FALLBACK_MODEL = "gemini-1.5-flash-latest"
+question = st.text_area("Enter your credit-related question:")
 
-def generate_answer(question):
-    try:
-        model = genai.GenerativeModel(PRIMARY_MODEL)
-        response = model.generate_content(question)
-        return f"🧠 Model: {PRIMARY_MODEL}\n\n{response.text}"
-    except Exception as e:
-        if "quota" in str(e).lower() or "429" in str(e) or "404" in str(e):
-            st.warning("⚠️ Pro model not available — switching to fallback model...")
-            try:
-                model = genai.GenerativeModel(FALLBACK_MODEL)
-                response = model.generate_content(question)
-                return f"⚡ Model: {FALLBACK_MODEL}\n\n{response.text}"
-            except Exception as e2:
-                return f"⚠️ Both models unavailable. Error: {e2}"
-        return f"⚠️ Error: {e}"
-
-# Streamlit UI
-user_question = st.text_input("Enter your credit-related question:")
 if st.button("Ask AI"):
-    if user_question.strip():
-        with st.spinner("Thinking..."):
-            answer = generate_answer(user_question)
-        st.success("✅ Answer:")
-        st.write(answer)
+    if not api_key or not question:
+        st.warning("Please enter both your API key and a question.")
     else:
-        st.warning("Please enter a question first.")
+        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+        headers = {"Content-Type": "application/json"}
+        data = {
+            "contents": [{
+                "parts": [{"text": f"Answer this credit-related question clearly and professionally: {question}"}]
+            }]
+        }
+
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+
+        if response.status_code == 200:
+            result = response.json()
+            try:
+                text_output = result["candidates"][0]["content"]["parts"][0]["text"]
+                st.success("✅ AI Credit Copilot says:")
+                st.write(text_output)
+            except Exception:
+                st.error("⚠️ Unexpected response format from the API.")
+                st.json(result)
+        else:
+            st.error(f"⚠️ Error {response.status_code}: {response.text}")
