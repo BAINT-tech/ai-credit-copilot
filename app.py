@@ -1,12 +1,30 @@
 import streamlit as st
 import random
 
-st.set_page_config(page_title="💳 AI Credit Copilot", page_icon="💳")
+# ----------------------------
+# Page Config
+# ----------------------------
+st.set_page_config(page_title="💳 AI Credit Copilot", page_icon="💳", layout="wide")
 
+# ----------------------------
+# Brand Logo
+# ----------------------------
+st.image("logo.png", width=150)  # Replace with your logo file
 st.title("💳 AI Credit Copilot")
-st.write("Get AI-powered guidance to improve and manage your credit — now with dynamic answers!")
+st.write("Get AI-powered guidance to improve and manage your credit. Track your scores and see chat history!")
 
-# Dynamic response generator
+# ----------------------------
+# Initialize Session State
+# ----------------------------
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+if "scores" not in st.session_state:
+    st.session_state.scores = []
+
+# ----------------------------
+# Dynamic AI Response Function
+# ----------------------------
 def get_dynamic_response(user_input):
     responses = {
         "credit score": [
@@ -52,12 +70,42 @@ def get_dynamic_response(user_input):
         ]
         return random.choice(fallback)
 
-# User input section
-user_question = st.text_input("Enter your credit-related question:")
+# ----------------------------
+# User Input Section
+# ----------------------------
+st.subheader("Ask a credit-related question")
+user_question = st.text_input("Enter your question:")
 
 if st.button("Get Advice"):
     if user_question.strip():
         answer = get_dynamic_response(user_question)
-        st.success(f"✅ Answer:\n\n{answer}")
+        # Save chat history
+        st.session_state.chat_history.append((user_question, answer))
     else:
         st.warning("Please enter a question first.")
+
+# ----------------------------
+# Display Chat History
+# ----------------------------
+if st.session_state.chat_history:
+    st.subheader("💬 Chat History")
+    for q, a in reversed(st.session_state.chat_history):
+        st.markdown(f"""
+        <div style="border:2px solid #00BFFF; padding:10px; border-radius:10px; margin-bottom:10px;">
+        <b>You:</b> {q} <br>
+        <b>AI:</b> {a}
+        </div>
+        """, unsafe_allow_html=True)
+
+# ----------------------------
+# Credit Tracker Section
+# ----------------------------
+st.subheader("📊 Credit Tracker")
+score = st.number_input("Enter your current credit score:", min_value=0, max_value=850, value=600)
+
+if st.button("Add Score"):
+    st.session_state.scores.append(score)
+    st.success(f"✅ Added score: {score}")
+
+if st.session_state.scores:
+    st.line_chart(st.session_state.scores)
